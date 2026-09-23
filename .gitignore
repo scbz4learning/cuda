@@ -22,3 +22,7 @@ experiments/**/vector_add
 resources/cutlass/build/
 resources/LeetCUDA/build/
 resources/cuda-samples/bin/
+
+# Zensical build output
+site/
+.cache/
