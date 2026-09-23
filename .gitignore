@@ -1,6 +1,7 @@
 # Build outputs
 build/
 bin/
+experiments/**/vector_add
 *.o
 *.obj
 *.ptx
