@@ -1,12 +1,12 @@
 [submodule "resources/learn-cuda"]
-	path = resources/learn-cuda
+	path = resources/modern-architectures/learn-cuda
 	url = https://github.com/gau-nernst/learn-cuda
 [submodule "resources/cutlass"]
-	path = resources/cutlass
+	path = resources/modern-architectures/cutlass
 	url = https://github.com/NVIDIA/cutlass
 [submodule "resources/LeetCUDA"]
-	path = resources/LeetCUDA
+	path = resources/tensor-cores/LeetCUDA
 	url = https://github.com/xlite-dev/LeetCUDA
 [submodule "resources/cuda-samples"]
-	path = resources/cuda-samples
+	path = resources/foundations/cuda-samples
 	url = https://github.com/NVIDIA/cuda-samples

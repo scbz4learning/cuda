@@ -1,13 +1,17 @@
-# 资料索引
+# 资源地图
 
-资料按"中文优先、官方为准、代码可执行"整理。核心代码库通过 git submodule 管理，更新时使用 `git submodule update --remote`。
+资源按“先建立上下文、再运行代码、最后核对官方定义”组织。submodule 只作为上游参考源；助教布置 task 时，应在任务书中写出具体路径、文件或搜索关键词，而不是只给仓库首页。
 
-## 本地仓库（submodule）
+## 本地资源
 
-- `cutlass/`：NVIDIA CUTLASS，Blackwell TCGen05 / TMEM / 2-SM MMA 最全实现，阅读 `examples/78_*` 和 `examples/79_*`
-- `learn-cuda/`：gau-nernst 的 Blackwell 裸 PTX 实战，含 tcgen05 for dummies 博客，适合理解硬件行为
-- `LeetCUDA/`：xlite-dev 的现代 CUDA 自助训练营，WMMA → MMA → CuTe → Blackwell TCGen05，含大量练习和 benchmark
-- `cuda-samples/`：NVIDIA 官方 CUDA 样例库，适合基础 CUDA、WMMA、MMA 入门
+| 分类 | 路径 | 适用内容 |
+| --- | --- | --- |
+| 基础 CUDA | [`foundations/`](foundations/) | CUDA Samples、kernel 基础、内存访问、transpose、reduction、scan、histogram |
+| 性能工程 | [`performance/`](performance/) | CUDA Core、GEMM、roofline、occupancy、Nsight Compute |
+| Tensor Core | [`tensor-cores/`](tensor-cores/) | WMMA、MMA、CuTe 入门和练习 |
+| 现代架构 | [`modern-architectures/`](modern-architectures/) | Hopper、Blackwell、TMA、WGMMA、TCGen05、TMEM |
+
+每个分类目录中的 `README.md` 说明 submodule 的用途、推荐入口、适用阶段和已知硬件限制。不要直接修改 submodule；需要补充学习提示时修改分类说明或 `zh-first.md`。
 
 ## 在线资料
 
@@ -20,10 +24,10 @@
 - [PTX ISA Reference](https://docs.nvidia.com/cuda/parallel-thread-execution/)
 - [Nsight Compute Documentation](https://docs.nvidia.com/cuda/nsight-compute/)
 
-## 推荐使用方式
+## 使用顺序
 
-1. 先看中文导览，形成关键词列表。
-2. 立刻打开 submodule 仓库或在线文档，找到可以编译运行的例子。
-3. 修改一个变量、tile、stage 或数据类型。
-4. 用 `ncu` 或计时结果记录变化。
-5. 在 `experiments/` 下保存命令、结果和结论。
+1. 先读 [中文优先清单](zh-first.md)，建立术语和问题列表。
+2. 进入对应分类的本地 submodule，定位一个能编译或能阅读的最小示例。
+3. 先复现，再只改一个变量、tile、stage 或数据类型。
+4. 用 `ncu` 或重复计时验证变化，把命令、输出和解释写入 task 的 `result.md`。
+5. 遇到具体指令或架构语义时回到官方文档核对，不以博客单独作为最终依据。

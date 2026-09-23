@@ -1,60 +1,66 @@
-# 从 0 到 Blackwell 实验路线
+# 从 0 到 Blackwell：能力路线
 
-顺序不是看课顺序，而是按“能跑通、能测量、能解释、能改”推进。
+路线按“能运行 -> 能测量 -> 能解释 -> 能修改”推进。方括号是学习进度：`[ ]` 未开始，`[-]` 进行中，`[x]` 已完成。当前尚未开始，第一项任务由助教放在 `experiments/stage-0/task-001-*`。
 
-## 前置
-- CUDA Toolkit >= 12.8，推荐 12.9
-- 能跑 `vector add`，会 `ncu`
-- 有 NVIDIA GPU；没有 B200/GB200 时用云 GPU（Modal / Lambda Labs），`gau-nernst` 的教程支持 Modal
+## 前置条件
 
-## 阶段 0：基础 CUDA + 内存层级
-资源：`cuda-samples` submodule / 官方仓库
+- CUDA Toolkit >= 12.8，推荐使用与目标 GPU 匹配的版本。
+- 能运行 `nvcc`；有 NVIDIA GPU 时再进行真实性能和 `ncu` 实验。
+- 没有目标硬件时可以先完成代码阅读和正确性任务，但必须在结果中写明限制。
 
-- [ ] 跑通 transpose、reduction、scan、histogram
-- [ ] 每个 kernel 至少改一个参数并记录 `ncu` 指标
-- [ ] 每个 kernel 至少修复一次 bank conflict / uncoalesced access
-- 完成标准：能独立定位 shared memory bank conflict 和 uncoalesced global memory access
+## 阶段 0：基础 CUDA 与内存层级
 
-## 阶段 1：CUDA Core GEMM 性能工程
-资源：`cuda-samples`、CUDA Best Practices Guide
+资源：`resources/foundations/`、CUDA Programming Guide。
 
-- [ ] tiled FP32 GEMM（naive → coalesced → shared memory → warp shuffle）
-- [ ] 至少 5 次 benchmark，记录 effective bandwidth / TFLOP/s
-- [ ] 理解 roofline、occupancy、arithmetic intensity
-- [ ] 修复至少 1 次 occupancy cliff
-- 完成标准：sgemm 达到 cuBLAS 50% 以上，能用数据解释优化有效的原因
+- [ ] 能解释 kernel、thread、block、grid 和 host/device 内存的关系。
+- [ ] 完成 vector add、transpose、reduction、scan、histogram 的正确性实验。
+- [ ] 能通过访问模式和 profiler 结果定位 coalescing 问题与 shared memory bank conflict。
+- 完成标准：能独立读懂一个基础 kernel，提出一个可验证的改动，并用结果解释变化。
 
-## 阶段 2：WMMA / Ampere Tensor Core
-资源：`cuda-samples`、LeetCUDA
+## 阶段 1：CUDA Core 性能工程
 
-- [ ] 跑通 FP16 WMMA GEMM
-- [ ] 理解 fragment 分布、warp 协作、`mma.sync` 约束
-- [ ] 对比 CUDA Core / WMMA / cuBLASLt 三份结果
-- 完成标准：能解释 fragment 布局和 `mma.sync` 的基本约束
+资源：`resources/performance/`、CUDA Best Practices Guide。
 
-## 阶段 3：Hopper MMA + CuTe 基础
-资源：`LeetCUDA`、CUTLASS `examples/70_*`
+- [ ] 从 naive 到 tiled 实现 FP32 GEMM，并保留每个版本。
+- [ ] 使用重复计时、arithmetic intensity、roofline 和 occupancy 解释性能。
+- [ ] 处理至少一个 occupancy cliff，并将自写 SGEMM 与 cuBLAS 对比。
+- 完成标准：SGEMM 达到 cuBLAS 约 50% 以上，且能用数据说明瓶颈和优化原因。
 
-- [ ] 读 CUTLASS `70_hopper_gemm*`，标出 TMA producer / WGMMA consumer / pipeline stages
-- [ ] 修改 stages 为 2/3/4，记录 smem 使用和 kernel 时间
-- [ ] 读 FlashAttention-3 Hopper mainloop
-- 完成标准：能沿着 CUTLASS mainloop 说清数据从 global memory 到 WGMMA 的路径
+## 阶段 2：WMMA 与 Tensor Core
 
-## 阶段 4：Blackwell tcgen05 + TMEM
-资源：`learn-cuda`（裸PTX）、CUTLASS `examples/78_*`、`examples/79_*`（SM120）
+资源：`resources/tensor-cores/`、CUDA Samples、LeetCUDA。
 
-- [ ] 读 `tcgen05 for dummies` 博客，手写 1 个最小 SM100 TCGen05 MMA kernel
-- [ ] 跑通 CUTLASS `78_blackwell_gemm`（SM100）或 `79_blackwell_geforce_gemm`（SM120）
-- [ ] 在示例中做 1 处小改动并重新验证正确性
-- 完成标准：能读懂并修改一个 CUTLASS Blackwell 示例，并解释改动对数据流或性能的影响
+- [ ] 跑通 FP16 WMMA GEMM。
+- [ ] 解释 fragment、warp 协作、布局和 `mma.sync` 的基本约束。
+- [ ] 对比 CUDA Core、WMMA 和 cuBLASLt 的正确性与性能。
+- 完成标准：能解释一次 fragment/layout 选择如何影响数据流。
 
-## 阶段 5：Blackwell 新特性拓展
-资源：CUTLASS ≥ 4.0、Blackwell Tuning Guide
+## 阶段 3：Hopper MMA 与 CuTe
 
-- [ ] NVFP4 / MXFP4/6/8 block scaled GEMM，scale factor 放 TMEM
-- [ ] 2-SM 联合 MMA（CTA-pair）
-- [ ] TMA 新 API、runtime 可变 cluster 形状
-- 完成标准：能解释为什么 scale factor 必须放 TMEM 而不是 shared memory
+资源：`resources/modern-architectures/`、CUTLASS `examples/70_*`。
 
-## 全程实验记录字段
-GPU、compute capability、驱动、CUDA、编译命令、输入规模、数据类型、正确性结果、kernel 时间、有效带宽或 TFLOP/s、ncu 关键指标、结论。
+- [ ] 标出 CUTLASS Hopper GEMM 中的 TMA producer、WGMMA consumer 和 pipeline stages。
+- [ ] 修改 stages 为 2/3/4，记录 shared memory、寄存器和 kernel 时间变化。
+- [ ] 阅读 FlashAttention-3 Hopper mainloop，并画出数据路径。
+- 完成标准：能沿着 mainloop 解释数据从 global memory 到 WGMMA 的流动。
+
+## 阶段 4：Blackwell tcgen05 与 TMEM
+
+资源：`resources/modern-architectures/`、CUTLASS `examples/78_*` 和 `79_*`。
+
+- [ ] 阅读 `tcgen05 for dummies`，完成一个最小可验证的 TCGen05 练习。
+- [ ] 跑通适配硬件的 CUTLASS Blackwell GEMM 示例。
+- [ ] 修改一个数据布局或 pipeline 参数，并重新验证正确性和性能。
+- 完成标准：能读懂并修改一个 Blackwell 示例，说明改动对数据流或性能的影响。
+
+## 阶段 5：Blackwell 特性拓展
+
+资源：CUTLASS、Blackwell Tuning Guide、PTX ISA。
+
+- [ ] 探索 NVFP4/MXFP block scaling、TMEM 中的 scale factor。
+- [ ] 了解 2-SM 联合 MMA、CTA-pair、TMA 新 API 和可变 cluster 形状。
+- 完成标准：能说明这些特性解决的硬件瓶颈，以及当前实验的硬件限制。
+
+## 进度记录规则
+
+阶段完成必须同时满足：对应 task 的 `result.md` 已填写、正确性有输出证据、测量条件完整、学习者能用自己的话解释结果。助教只在这些证据出现后更新本文件；单纯读完链接不算完成。

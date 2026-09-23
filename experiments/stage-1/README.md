@@ -1,16 +1,14 @@
-# 阶段 1：基础并行模式
+# 阶段 1：CUDA Core 性能工程
 
-建议按以下顺序实现，每一步都保留 baseline：
+## 阶段目标
 
-1. matrix transpose：连续访问与 shared memory
-2. reduction：naive、shared memory、warp shuffle
-3. scan：先读 `cuda-samples`，再实现自己的版本
-4. tiled FP32 GEMM：先正确，再测量，再优化
+从正确的并行程序进入性能工程：保留 baseline，改变一个性能变量，用计时和 profiler 解释 global memory、shared memory、寄存器、occupancy 与算术强度之间的关系。
 
-推荐参考：
+## 推荐 task 顺序
 
-- [cuda-samples](https://github.com/NVIDIA/cuda-samples)
-- [cuda-practice-tutorial](https://github.com/YouXam/cuda-practice-tutorial)
-- [OpenlabLecture](https://github.com/hageboeck/OpenlabLecture)
+1. transpose：连续访问与 shared memory。
+2. reduction：naive、shared memory、warp shuffle。
+3. scan：先阅读官方 sample，再实现自己的版本。
+4. tiled FP32 GEMM：先正确，再测量，再优化。
 
-每个实验复制 `../log-template.md`，并记录输入规模、正确性和 ncu 指标。
+每个 task 都应使用 `resources/foundations/cuda-samples` 或 `resources/performance/` 中的具体入口，并在自己的目录保留 baseline、命令和结果。
