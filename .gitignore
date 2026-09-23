@@ -17,3 +17,8 @@ experiments/**/vector_add
 .vscode/
 .DS_Store
 *.swp
+
+# Submodule build artifacts (do not commit)
+resources/cutlass/build/
+resources/LeetCUDA/build/
+resources/cuda-samples/bin/

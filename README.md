@@ -2,18 +2,19 @@
 
 这是一个以 **读代码、跑实验、看 profiler** 为主的 CUDA 学习资料仓库。主线从 CUDA 编程模型开始，经过 CUDA Core、性能工程、WMMA/Tensor Core、Hopper，再到 Blackwell 的 `tcgen05` / UMMA / TMEM。
 
-本仓库不复制外部教材或课程内容，只保存：
-
+本仓库保存：
 - 可访问的资料链接与阅读顺序
 - 阶段检查清单
 - 实验目录与记录模板
 - 本地环境、硬件和结果记录
+- 通过 git submodule 管理的关键仓库代码
 
 ## 快速开始
 
 ```bash
 git clone <your-repository-url>
 cd cuda-from-zero-to-blackwell
+git submodule update --init --recursive
 ```
 
 先阅读：
@@ -31,13 +32,20 @@ cd cuda-from-zero-to-blackwell
 ├── ROADMAP.md
 ├── resources/
 │   ├── README.md
-│   └── zh-first.md
+│   ├── zh-first.md
+│   ├── cutlass/        # git submodule: NVIDIA/CUTLASS
+│   ├── learn-cuda/     # git submodule: gau-nernst/learn-cuda
+│   ├── LeetCUDA/       # git submodule: xlite-dev/LeetCUDA
+│   └── cuda-samples/   # git submodule: NVIDIA/cuda-samples
 ├── experiments/
 │   ├── README.md
 │   ├── log-template.md
 │   ├── stage-0/
 │   ├── stage-1/
-│   └── stage-2/
+│   ├── stage-2/
+│   ├── stage-3/
+│   ├── stage-4/
+│   └── stage-5/
 ├── notes/
 │   └── .gitkeep
 └── .gitignore
@@ -52,9 +60,9 @@ cd cuda-from-zero-to-blackwell
 
 ## 进度
 
-- [ ] 阶段 0：编程模型与工具
-- [ ] 阶段 1：基础 kernel 与并行模式
-- [ ] 阶段 2：性能工程
-- [ ] 阶段 3：WMMA / Tensor Core
-- [ ] 阶段 4：Hopper TMA / WGMMA
-- [ ] 阶段 5：Blackwell UMMA / TMEM / `tcgen05`
+- [ ] 阶段 0：基础 CUDA + 内存层级
+- [ ] 阶段 1：CUDA Core GEMM 性能工程
+- [ ] 阶段 2：WMMA / Ampere Tensor Core
+- [ ] 阶段 3：Hopper MMA + CuTe 基础
+- [ ] 阶段 4：Blackwell tcgen05 + TMEM
+- [ ] 阶段 5：Blackwell 新特性拓展

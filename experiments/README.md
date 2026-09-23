@@ -1,15 +1,15 @@
 # 实验目录
 
-实验按阶段放置。每次实验建议建立一个独立目录或复制 [记录模板](log-template.md)，不要只保存最终数字。
+实验按阶段放置。每次实验建议建立独立目录或复制 [记录模板](log-template.md)，不要只保存最终数字。
 
 ## 阶段目录
 
-- `stage-0/`：环境检查、vector add、第一次 `ncu`
-- `stage-1/`：transpose、reduction、scan、tiled GEMM
-- `stage-2/`：roofline、occupancy、bank conflict、persistent kernel
-- `stage-3/`：建议后续新增 WMMA / `mma.sync`
-- `stage-4/`：建议在 Hopper 环境新增 TMA / WGMMA / CUTLASS 实验
-- `stage-5/`：建议在 Blackwell 环境新增 `tcgen05` / TMEM / cluster 实验
+- `stage-0/`：基础 CUDA、transpose、reduction、scan、histogram
+- `stage-1/`：CUDA Core GEMM、性能工程、roofline、occupancy
+- `stage-2/`：WMMA / Ampere Tensor Core
+- `stage-3/`：Hopper MMA + CuTe 基础
+- `stage-4/`：Blackwell tcgen05 + TMEM
+- `stage-5/`：Blackwell 新特性拓展（NVFP4/MXFP8、2-SM MMA、TMA）
 
 ## 每个实验至少保存
 
