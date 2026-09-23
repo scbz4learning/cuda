@@ -1,0 +1,18 @@
+# Build outputs
+build/
+bin/
+*.o
+*.obj
+*.ptx
+*.cubin
+*.fatbin
+
+# CUDA profiling outputs
+*.ncu-rep
+*.nsys-rep
+*.sqlite
+
+# Local notes and editor files
+.vscode/
+.DS_Store
+*.swp
