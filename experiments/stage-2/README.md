@@ -1,14 +1,31 @@
-# 阶段 2：WMMA 与 Tensor Core
+# 阶段 2：合并访问与内存事务
 
 ## 阶段目标
 
-理解 warp 级矩阵运算的协作方式，而不是只调用一个更快的库函数。先保留阶段 1 的 CUDA Core GEMM 作为 baseline，再比较 WMMA、MMA 和 cuBLASLt。
+能手算一次访存跨多少个 sector，并据此改写索引使它合并。这是全路线中复用价值最高的一项能力。
 
-## 推荐 task 顺序
+## Task 队列
 
-1. 从 `resources/tensor-cores/LeetCUDA/` 或 CUDA Samples 找到最小 WMMA GEMM。
-2. 验证 FP16 输入、FP32 累加和结果容差。
-3. 记录 fragment/layout、warp 协作和 `mma.sync` 约束。
-4. 在同一输入规模下比较 CUDA Core、WMMA 和 cuBLASLt。
+| 进度 | Task | 只引入 |
+| --- | --- | --- |
+| [ ] | `task-001-stride-and-sector` | stride 与 sector/transaction 的关系 |
+| [ ] | `task-002-coalesced-vs-strided` | 同一算法两种索引写法的因果对比 |
+| [ ] | `task-003-vectorized-load-float4` | `float4` / `int4` 向量化访存与对齐要求 |
+| [ ] | `task-004-transpose-access-patterns` | 转置中读与写不能同时合并 |
+| [ ] | `task-005-l1-l2-and-caching` | L1/L2 容量与 read-only cache；解释“看起来不合并却很快” |
 
-硬件不支持目标 Tensor Core 时，task 可以停在代码阅读和编译分析，但结果必须明确标注“未实测”。
+目录在本阶段开始时创建。
+
+## 阶段验收
+
+- [ ] 给定一个索引表达式和元素类型，能写出 32 个 lane 的地址、间隔字节数、覆盖的 32 字节 sector 数。
+- [ ] 能用带宽曲线（stride 1/2/4/8/16）定位一个 kernel 的实际访存模式。
+- [ ] 能解释为什么 `float4` 加载要求 16 字节对齐，以及不满足时会看到什么。
+
+## 资源
+
+CUDA Programming Guide §2.3、Best Practices Guide “Coalesced Access to Global Memory”、[`cuda-samples/cpp/6_Performance/transpose/`](../../resources/foundations/cuda-samples/cpp/6_Performance/transpose/)。硬件：T4 实测。
+
+## 备注
+
+`task-004` 承接原 `experiments/stage-0/task-002-transpose-coalescing/` 的第 1、2 步内容（naive 转置的读合并/写不合并），该 task 范围过大已删除，其 bank 模型与分块部分归阶段 3。拆分说明见 [`ROADMAP.md`](../../ROADMAP.md) 的“现状映射”。

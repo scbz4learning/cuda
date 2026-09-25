@@ -10,3 +10,11 @@
 [submodule "resources/cuda-samples"]
 	path = resources/foundations/cuda-samples
 	url = https://github.com/NVIDIA/cuda-samples
+[submodule "resources/performance/cuda-kernel-academy"]
+	path = resources/performance/cuda-kernel-academy
+	url = https://github.com/AICL-Lab/cuda-kernel-academy
+	branch = master
+[submodule "resources/practice/pmpp-cuda-study"]
+	path = resources/practice/pmpp-cuda-study
+	url = https://github.com/manishklach/pmpp-cuda-study
+	branch = main

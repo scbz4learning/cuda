@@ -1,14 +1,26 @@
-# 阶段 1：CUDA Core 性能工程
+# 阶段 1：执行模型与线程组织
 
 ## 阶段目标
 
-从正确的并行程序进入性能工程：保留 baseline，改变一个性能变量，用计时和 profiler 解释 global memory、shared memory、寄存器、occupancy 与算术强度之间的关系。
+能预测任意索引表达式下 warp 的访问集合，并用实验解释 divergence 和 block 形状的代价。这是后面所有内存优化的前提：不知道 warp 怎么执行，就无法判断一次访存是否合并。
 
-## 推荐 task 顺序
+## Task 队列
 
-1. transpose：连续访问与 shared memory。
-2. reduction：naive、shared memory、warp shuffle。
-3. scan：先阅读官方 sample，再实现自己的版本。
-4. tiled FP32 GEMM：先正确，再测量，再优化。
+| 进度 | Task | 只引入 |
+| --- | --- | --- |
+| [ ] | `task-001-warp-and-lane` | warp = 32、lane 与 `threadIdx` 的关系、每 SM 的 warp 调度 |
+| [ ] | `task-002-simt-divergence` | SIMT 与 divergence；分支代价如何被观察到 |
+| [ ] | `task-003-two-dimensional-indexing` | 2D/3D `blockDim`/`blockIdx`，与 1D 展开的等价性 |
+| [ ] | `task-004-block-size-and-grid-shape` | block 大小作为性能参数；尾块与最后一个 block 的部分空闲 |
 
-每个 task 都应使用 `resources/foundations/cuda-samples` 或 `resources/performance/` 中的具体入口，并在自己的目录保留 baseline、命令和结果。
+目录在本阶段开始时创建。
+
+## 阶段验收
+
+- [ ] 给定一个 3D 索引 kernel，能写出每个 warp 的 32 个 lane 各自算出的线性下标。
+- [ ] 能用实验区分“divergence 慢”与“访存不合并慢”，并说明两者的区别。
+- [ ] 能解释为什么 block 大小为 32 时同一 block 只有一个 warp。
+
+## 资源
+
+CUDA Programming Guide §2.3（Writing SIMT Kernels）、§5.8（Execution model）、[`resources/foundations/`](../../resources/foundations/)。硬件：T4 实测。

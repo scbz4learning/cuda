@@ -1,15 +1,28 @@
-# 阶段 0：基础 CUDA 与内存层级
+# 阶段 0：工具链与可测量性
 
 ## 阶段目标
 
-建立 CUDA 的执行模型和内存模型，能够从一个最小 kernel 开始，逐步读懂线程映射、访问模式、正确性检查和 profiler 输出。
+建立 CUDA 实验闭环：能编译 host/device 混合程序，能解释线程索引和边界判断，能用输出确认结果，能稳定计时，并如实记录环境。本阶段专门建立“可测量性”，它不会随第一个 kernel 自动获得。
 
 ## Task 队列
 
-- `task-001-vector-add/`：编译并解释第一个 CUDA kernel。（已完成）
-- `task-002-transpose-coalescing/`：矩阵转置、合并访问模式、shared memory bank conflict 与 padding。（进行中）
-- 后续 task：由助教根据 `ROADMAP.md`、基础资源和上一个 task 的结果生成，不提前伪造完成进度。
+| 进度 | Task | 只引入 |
+| --- | --- | --- |
+| [x] | `task-001-vector-add/` | 第一个 kernel、1D 索引、边界判断 |
+| [ ] | `task-002-device-query-and-error-check` | 设备查询与 `cudaGetLastError` / 错误检查宏 |
+| [ ] | `task-003-compile-flags-and-resource-usage` | `nvcc` 选项与 `cuobjdump -res-usage` 看到的寄存器/共享内存 |
+| [ ] | `task-004-timing-protocol` | `cudaEvent` 计时、warm-up、重复、min/median/mean、空 kernel 的 launch 开销 |
+| [ ] | `task-901-巩固-harness` | **巩固**：把计时 harness 固化成可复用文件 |
+
+后续 task 由助教根据 `ROADMAP.md` 阶段 0、基础资源和上一个 task 的结果生成，不提前伪造完成进度。目录在本阶段开始时创建。
 
 ## 阶段验收
 
-至少完成 vector add、transpose、reduction、scan、histogram 的 task，并能指出一个 coalescing 或 shared memory 访问问题。每项都必须有对应 `result.md`，而不是只在聊天中报告“跑过了”。
+- [ ] 能用 `cudaGetDeviceProperties` 打印并解释 CC、SM 数、L2 大小、峰值带宽四个字段的来源。
+- [ ] 能说出一个“编译通过但运行报错”的例子，并用 `cudaGetLastError` 与 `compute-sanitizer` 区分是启动失败还是运行中出错。
+- [ ] 能用 `cuobjdump -res-usage` 读出某个 kernel 的寄存器数和静态共享内存数，并说明它受哪个编译选项影响。
+- [ ] 给出空 kernel 的 launch 开销中位数，后续所有 kernel 计时都以此为噪声下限。
+
+## 注意
+
+原 `task-002-transpose-coalescing/` 一次引入二维索引、shared memory、动态共享内存、bank 模型、计时协议共五项，已删除。内容按新路线拆到阶段 2 的 `task-004` 与阶段 3 的 `task-003`~`005`，计时协议移到本阶段 `task-004`。说明见 [`ROADMAP.md`](../../ROADMAP.md) 的“现状映射”。

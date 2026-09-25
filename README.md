@@ -1,8 +1,25 @@
 # 从 0 到 Blackwell 的 CUDA 学习项目
 
-这是一个由 AI 担任助教、以代码和可重复实验为主线的 CUDA 学习仓库。学习顺序从 CUDA 编程模型、内存层级和并行模式开始，逐步进入 CUDA Core 性能工程、Tensor Core、Hopper，再到 Blackwell 的 `tcgen05`、UMMA 和 TMEM。
+这是一个由 AI 担任助教、以代码和可重复实验为主线的 CUDA 学习仓库。学习顺序从 CUDA 编程模型、内存层级和并行模式开始，逐步进入 CUDA Core 性能工程、Tensor Core、Hopper，再到 Blackwell 的 `tcgen05` 和 TMEM。完整路线共 14 个阶段，见 [学习路线与进度](ROADMAP.md)。
 
 仓库的基本单位不是“看完一章”，而是一个可以运行、测量、解释和复盘的 task。助教每次只布置一个 task，学习者完成后提交代码、命令、输出和结论，再进入下一步。
+
+## 本机环境
+
+路线分两个阶段用不同硬件。
+
+**当前开发机**（2026-09-25 实测）：2 × Tesla T4（compute capability 7.5，15 GB），峰值显存带宽 320 GB/s，Driver 580.159.04，CUDA Toolkit 12.8，`ncu` 2025.1.1 已安装但硬件计数器不可用（`ERR_NVGPUCTRPERM`）。
+
+**目标机**：NVIDIA B200（compute capability 10.0，HBM3/HBM3e 最多 180 GB，第五代 NVLink）。
+
+这决定了每个阶段的证据类型：
+
+- 阶段 0~10 在 T4 上实测。阶段 10 的 FP16 WMMA 是 T4 能跑的最深一层——T4 没有 bf16、`cp.async`、INT8 `m16n8k32`。
+- 阶段 11（`cp.async`、bf16）需 sm_80+，阶段 12（Hopper）需 sm_90+。在 T4 上用 `nvcc -arch=sm_90` 做交叉编译与静态分析，**不写时间数字**；切到 B200 后转为实测。
+- 阶段 13（Blackwell `tcgen05`、TMEM、NVFP4）需 sm_100+，主要目标机器是 B200。
+- 阶段 14 综合项目在 T4 上完成，末尾有一个 B200 上的 Tensor Core 对照。
+
+完整架构能力矩阵、B200 资源上限和证据分级见 [学习路线与进度](ROADMAP.md#架构能力矩阵)。
 
 ## 开始学习
 
@@ -39,6 +56,7 @@ git submodule update --init --recursive
 ## 学习原则
 
 - 先保证正确性，再进行测量和优化；每次实验只改变一个主要变量。
-- 所有性能结论都要绑定 GPU、compute capability、驱动、CUDA、编译参数、输入规模和 profiler 结果。
+- 一个 task 只引入一个新概念。需要两个新概念就拆成两个 task。
+- 所有性能结论都要绑定 GPU、compute capability、驱动、CUDA、编译参数、输入规模和 profiler 结果，并标明属于“实测 / 交叉编译 / 静态分析 / 待验证”中的哪一级。
 - 中文资料用于建立上下文；具体指令、硬件行为和 API 约束回到官方文档、PTX ISA、CUTLASS 源码和实验验证。
-- 阶段 3 及以后依赖特定硬件。没有 Hopper 或 Blackwell 时仍可阅读和完成可移植部分，但不能把模拟或阅读结果当成目标硬件实测。
+- 阶段 11 及以后依赖特定硬件。没有对应 GPU 时仍可阅读和完成可交叉编译的部分，但不能把编译结果或阅读结果当成目标硬件实测。
