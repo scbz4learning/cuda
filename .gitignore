@@ -1,7 +1,6 @@
 # Build outputs
 build/
-bin/
-experiments/**/vector_add
+# bin/
 *.o
 *.obj
 *.ptx
@@ -9,9 +8,9 @@ experiments/**/vector_add
 *.fatbin
 
 # CUDA profiling outputs
-*.ncu-rep
-*.nsys-rep
-*.sqlite
+# *.ncu-rep
+# *.nsys-rep
+# *.sqlite
 
 # Local notes and editor files
 .vscode/

@@ -1,6 +1,6 @@
 # 从 0 到 Blackwell：能力路线
 
-路线按“能运行 -> 能测量 -> 能解释 -> 能修改”推进。方括号是学习进度：`[ ]` 未开始，`[-]` 进行中，`[x]` 已完成。当前尚未开始，第一项任务由助教放在 `experiments/stage-0/task-001-*`。
+路线按“能运行 -> 能测量 -> 能解释 -> 能修改”推进。方括号是学习进度：`[ ]` 未开始，`[-]` 进行中，`[x]` 已完成。当前处于阶段 0：已完成 `task-001-vector-add`。每次只推进一个 task，下一项任务由助教放在 `experiments/stage-x/task-y-*`。
 
 ## 前置条件
 
@@ -12,8 +12,8 @@
 
 资源：`resources/foundations/`、CUDA Programming Guide。
 
-- [ ] 能解释 kernel、thread、block、grid 和 host/device 内存的关系。
-- [ ] 完成 vector add、transpose、reduction、scan、histogram 的正确性实验。
+- [x] 能解释 kernel、thread、block、grid 和 host/device 内存的关系。（证据：`stage-0/task-001-vector-add/result.md` 的数据流与线程映射小节）
+- [-] 完成 vector add、transpose、reduction、scan、histogram 的正确性实验。（vector add 已完成）
 - [ ] 能通过访问模式和 profiler 结果定位 coalescing 问题与 shared memory bank conflict。
 - 完成标准：能独立读懂一个基础 kernel，提出一个可验证的改动，并用结果解释变化。
 

@@ -6,7 +6,7 @@
 
 ## Task 队列
 
-- `task-001-vector-add/`：编译并解释第一个 CUDA kernel。
+- `task-001-vector-add/`：编译并解释第一个 CUDA kernel。（已完成）
 - 后续 task：由助教根据 `ROADMAP.md`、基础资源和上一个 task 的结果生成，不提前伪造完成进度。
 
 ## 阶段验收

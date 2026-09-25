@@ -1,0 +1,238 @@
+# task 001
+
+
+
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# cat vector_add.cu 
+#include <cuda_runtime.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <vector>
+
+#define CUDA_CHECK(call)                                                   \
+    do {                                                                   \
+        cudaError_t error = (call);                                        \
+        if (error != cudaSuccess) {                                        \
+            std::fprintf(stderr, "%s:%d CUDA error: %s\n", __FILE__,      \
+                         __LINE__, cudaGetErrorString(error));             \
+            return EXIT_FAILURE;                                           \
+        }                                                                    \
+    } while (false)
+
+__global__ void vector_add(const float* left, const float* right, float* output,
+                           int count) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    if (index < count) {
+        output[index] = left[index] + right[index];
+    }
+}
+
+int main() {
+    constexpr int count = 1 << 20;
+    constexpr int block_size = 256;
+    const size_t bytes = static_cast<size_t>(count) * sizeof(float);
+
+    std::vector<float> host_left(count, 1.0f);
+    std::vector<float> host_right(count, 2.0f);
+    std::vector<float> host_output(count, 0.0f);
+
+    float* device_left = nullptr;
+    float* device_right = nullptr;
+    float* device_output = nullptr;
+    CUDA_CHECK(cudaMalloc(&device_left, bytes));
+    CUDA_CHECK(cudaMalloc(&device_right, bytes));
+    CUDA_CHECK(cudaMalloc(&device_output, bytes));
+
+    CUDA_CHECK(cudaMemcpy(device_left, host_left.data(), bytes, cudaMemcpyHostToDevice));
+    CUDA_CHECK(cudaMemcpy(device_right, host_right.data(), bytes, cudaMemcpyHostToDevice));
+
+    int grid_size = (count + block_size - 1) / block_size;
+    vector_add<<<grid_size, block_size>>>(device_left, device_right, device_output, count);
+    CUDA_CHECK(cudaGetLastError());
+    CUDA_CHECK(cudaDeviceSynchronize());
+
+    CUDA_CHECK(cudaMemcpy(host_output.data(), device_output, bytes, cudaMemcpyDeviceToHost));
+
+    bool correct = true;
+    for (float value : host_output) {
+        if (value != 3.0f) {
+            correct = false;
+            break;
+        }
+    }
+
+    CUDA_CHECK(cudaFree(device_left));
+    CUDA_CHECK(cudaFree(device_right));
+    CUDA_CHECK(cudaFree(device_output));
+
+    std::printf("vector_add: %s\n", correct ? "PASS" : "FAIL");
+    return correct ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# ls
+README.md  result.md  vector_add  vector_add.cu
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# nsys profile -o vector_add_trace ./vector_add
+Collecting data...
+vector_add: PASS
+Generating '/tmp/nsys-report-bfab.qdstrm'
+[1/1] [========================100%] vector_add_trace.nsys-rep
+Generated:
+    /kaggle/working/cuda/experiments/stage-0/task-001-vector-add/vector_add_trace.nsys-rep
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# nsys stats vector_add_trace.nsys-rep 
+Generating SQLite file vector_add_trace.sqlite from vector_add_trace.nsys-rep
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/nvtx_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain NV Tools Extension (NVTX) data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/osrt_sum.py]... 
+
+ ** OS Runtime Summary (osrt_sum):
+
+ Time (%)  Total Time (ns)  Num Calls    Avg (ns)     Med (ns)    Min (ns)   Max (ns)     StdDev (ns)            Name         
+ --------  ---------------  ---------  ------------  -----------  --------  -----------  -------------  ----------------------
+     73.0      634,407,711         13  48,800,593.2  8,222,992.0     2,225  468,051,263  127,670,733.3  poll                  
+     26.4      229,399,029        672     341,367.6     16,988.0     1,100   19,359,973    1,144,882.8  ioctl                 
+      0.3        2,187,329         31      70,559.0     11,666.0     8,617    1,529,580      271,576.0  mmap64                
+      0.1          646,002         10      64,600.2     57,479.0    37,738      111,324       22,545.5  sem_timedwait         
+      0.1          605,660         56      10,815.4      9,166.5     3,527       40,678        5,956.4  open64                
+      0.1          460,135         60       7,668.9      5,045.5     1,682       27,966        6,361.2  fopen                 
+      0.0          221,251          1     221,251.0    221,251.0   221,251      221,251            0.0  pthread_cond_wait     
+      0.0          217,629         15      14,508.6     10,434.0     2,027       84,604       20,108.9  mmap                  
+      0.0          157,887          2      78,943.5     78,943.5    60,527       97,360       26,044.9  pthread_create        
+      0.0          129,562         52       2,491.6      2,017.5     1,594        5,409        1,011.6  fclose                
+      0.0           90,018         62       1,451.9      1,287.5     1,002        5,859          795.8  fcntl                 
+      0.0           79,828         12       6,652.3      6,887.5     1,829        8,914        1,968.9  write                 
+      0.0           63,467          1      63,467.0     63,467.0    63,467       63,467            0.0  fgets                 
+      0.0           30,979         12       2,581.6      2,678.5     1,653        3,157          526.4  read                  
+      0.0           28,645          6       4,774.2      4,608.0     2,507        8,510        2,245.7  open                  
+      0.0           25,272          2      12,636.0     12,636.0    10,442       14,830        3,102.8  socket                
+      0.0           24,883          3       8,294.3      9,695.0     4,688       10,500        3,149.0  munmap                
+      0.0           17,639          3       5,879.7      6,793.0     3,589        7,257        1,997.3  pipe2                 
+      0.0           15,783          3       5,261.0      5,439.0     2,645        7,699        2,531.7  fread                 
+      0.0           14,831          2       7,415.5      7,415.5     2,785       12,046        6,548.5  pthread_cond_broadcast
+      0.0           12,231          1      12,231.0     12,231.0    12,231       12,231            0.0  connect               
+      0.0            6,163          2       3,081.5      3,081.5     2,535        3,628          772.9  fwrite                
+      0.0            5,909          5       1,181.8      1,184.0     1,131        1,236           39.3  dup                   
+      0.0            2,177          1       2,177.0      2,177.0     2,177        2,177            0.0  bind                  
+      0.0            1,689          1       1,689.0      1,689.0     1,689        1,689            0.0  listen                
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/cuda_api_sum.py]... 
+
+ ** CUDA API Summary (cuda_api_sum):
+
+ Time (%)  Total Time (ns)  Num Calls    Avg (ns)    Med (ns)   Min (ns)   Max (ns)     StdDev (ns)            Name         
+ --------  ---------------  ---------  ------------  ---------  --------  -----------  -------------  ----------------------
+     98.1      202,165,106          3  67,388,368.7  162,270.0    97,841  201,904,995  116,494,820.1  cudaMalloc            
+      1.4        2,954,898          3     984,966.0  983,208.0   947,347    1,024,343       38,528.1  cudaMemcpy            
+      0.3          579,152          3     193,050.7  207,527.0   158,744      212,881       29,830.8  cudaFree              
+      0.1          273,891          1     273,891.0  273,891.0   273,891      273,891            0.0  cudaLaunchKernel      
+      0.0           47,271          1      47,271.0   47,271.0    47,271       47,271            0.0  cudaDeviceSynchronize 
+      0.0              686          1         686.0      686.0       686          686            0.0  cuModuleGetLoadingMode
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/cuda_gpu_kern_sum.py]... 
+
+ ** CUDA GPU Kernel Summary (cuda_gpu_kern_sum):
+
+ Time (%)  Total Time (ns)  Instances  Avg (ns)  Med (ns)  Min (ns)  Max (ns)  StdDev (ns)                           Name                         
+ --------  ---------------  ---------  --------  --------  --------  --------  -----------  ------------------------------------------------------
+    100.0           46,272          1  46,272.0  46,272.0    46,272    46,272          0.0  vector_add(const float *, const float *, float *, int)
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/cuda_gpu_mem_time_sum.py]... 
+
+ ** CUDA GPU MemOps Summary (by Time) (cuda_gpu_mem_time_sum):
+
+ Time (%)  Total Time (ns)  Count  Avg (ns)   Med (ns)   Min (ns)  Max (ns)  StdDev (ns)           Operation          
+ --------  ---------------  -----  ---------  ---------  --------  --------  -----------  ----------------------------
+     71.6        1,542,676      2  771,338.0  771,338.0   766,138   776,538      7,353.9  [CUDA memcpy Host-to-Device]
+     28.4          612,251      1  612,251.0  612,251.0   612,251   612,251          0.0  [CUDA memcpy Device-to-Host]
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/cuda_gpu_mem_size_sum.py]... 
+
+ ** CUDA GPU MemOps Summary (by Size) (cuda_gpu_mem_size_sum):
+
+ Total (MB)  Count  Avg (MB)  Med (MB)  Min (MB)  Max (MB)  StdDev (MB)           Operation          
+ ----------  -----  --------  --------  --------  --------  -----------  ----------------------------
+      8.389      2     4.194     4.194     4.194     4.194        0.000  [CUDA memcpy Host-to-Device]
+      4.194      1     4.194     4.194     4.194     4.194        0.000  [CUDA memcpy Device-to-Host]
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/openmp_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain OpenMP event data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/opengl_khr_range_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain KHR Extension (KHR_DEBUG) data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/opengl_khr_gpu_range_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain GPU KHR Extension (KHR_DEBUG) data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/vulkan_marker_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain Vulkan Debug Extension (Vulkan Debug Util) data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/vulkan_gpu_marker_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain GPU Vulkan Debug Extension (GPU Vulkan Debug markers) data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/dx11_pix_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain DX11 CPU debug markers.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/dx12_gpu_marker_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain DX12 GPU debug markers.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/dx12_pix_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain DX12 CPU debug markers.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/wddm_queue_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain WDDM context data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/um_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain CUDA Unified Memory CPU page faults data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/um_total_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain CUDA Unified Memory CPU page faults data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/um_cpu_page_faults_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain CUDA Unified Memory CPU page faults data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/openacc_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain OpenACC event data.
+
+Processing [vector_add_trace.sqlite] with [/opt/nvidia/nsight-systems/2024.6.2/host-linux-x64/reports/syscall_sum.py]... 
+SKIPPED: vector_add_trace.sqlite does not contain syscall data.
+
+
+
+
+
+__global__ void vector_add(const float* left, const float* right, float* output,
+                           int count) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    // if (index < count) {
+        output[index] = left[index] + right[index];
+    // }
+}
+
+int main() {
+    constexpr int count = 1 << 20;
+    constexpr int block_size = 256;
+
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# nvcc -O3 -lineinfo vector_add.cu -o vector_add
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# ./vector_add 
+vector_add: PASS
+
+
+
+__global__ void vector_add(const float* left, const float* right, float* output,
+                           int count) {
+    int index = blockIdx.x * blockDim.x + threadIdx.x;
+    // if (index < count) {
+        output[index] = left[index] + right[index];
+    // }
+}
+
+int main() {
+    constexpr int count = 1 << 20;
+    constexpr int block_size = 192;
+
+    
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# nvcc -O3 -lineinfo vector_add.cu -o vector_add
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+/kaggle/working/cuda/experiments/stage-0/task-001-vector-add# ./vector_add 
+vector_add.cu:47 CUDA error: an illegal memory access was encountered
