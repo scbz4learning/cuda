@@ -2,7 +2,7 @@
 
 ## 目标
 
-建立最小 CUDA 实验闭环：能编译 host/device 混合程序，能解释线程索引和边界判断，能用输出确认结果，并记录第一次 profiler 观察。
+建立最小 CUDA 实验闭环：能编译 host/device 混合程序，能解释线程索引和边界判断，并用输出确认结果。尝试观察 profiler；工具不可用时说明限制即可，不要求写实验记录文件。
 
 ## 前置条件
 
@@ -21,14 +21,14 @@
 
 3. 确认输出包含 `vector_add: PASS`。
 4. 只修改一个参数或实现细节，例如将 `block_size` 改为 128 或 512，重新编译并确认结果仍正确。
-5. 有 `ncu` 时运行 `ncu --set basic ./vector_add`；没有时说明工具缺失，不要伪造指标。
-6. 将命令、输出、环境、改动和解释填写到 `result.md`。
+5. 若有 `ncu` 权限，运行 `ncu --set basic ./vector_add`。若没有性能计数器权限，可尝试 `nsys profile --trace=cuda -o vector_add_trace ./vector_add`，再用 `nsys stats vector_add_trace.nsys-rep` 查看 CUDA API 和 kernel 时间线统计。`nsys` 可以观察执行时间线，但不能替代 `ncu` 的 occupancy、带宽或硬件计数器指标；若工具不可用，报告错误即可。
+6. 向助教说明你的改动、运行输出、线程索引和边界判断的理解，以及 profiler 是否可用。是否另行记录由你决定。
 
 ## 交付物
 
 - `vector_add.cu` 的一次可解释修改，或说明为什么保持原实现。
 - 两次运行的正确性输出。
-- 填写完整的 `result.md`。
+- 能解释代码与输出；无需提交 `result.md`。
 
 ## 验收标准
 

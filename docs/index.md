@@ -21,7 +21,7 @@ icon: lucide/graduation-cap
 
 ## 学习方式
 
-- 学习以 task 为基本单位。每个 task 都应有任务书、代码、运行命令和结果记录。
+- 学习以 task 为基本单位。每个 task 都有任务书；代码、运行输出和解释用于展示学习结果，持久化记录由学习者按需选择。
 - 助教每次只布置一个 task，并根据路线图、资源和上一个 task 的结果决定下一步。
 - 实验遵循“先正确，再测量，后优化”；性能结论必须有可复现的环境、输入和 profiler 或计时结果。
 - 当前路线从基础 CUDA 和内存层级开始，经过 CUDA Core、Tensor Core、Hopper，逐步进入 Blackwell 的 `tcgen05`、UMMA 和 TMEM。

@@ -11,4 +11,4 @@
 
 ## 阶段验收
 
-至少完成 vector add、transpose、reduction、scan、histogram 的 task，并能指出一个 coalescing 或 shared memory 访问问题。每项都必须有对应 `result.md`，而不是只在聊天中报告“跑过了”。
+至少完成 vector add、transpose、reduction、scan、histogram 的 task，并能指出一个 coalescing 或 shared memory 访问问题。通过代码、运行输出和自己的解释展示掌握情况即可；不要求为每项 task 创建 `result.md`。
