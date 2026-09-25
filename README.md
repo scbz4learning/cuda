@@ -14,7 +14,7 @@
 
 这决定了每个阶段的证据类型：
 
-- 阶段 0~10 在 T4 上实测。阶段 10 的 FP16 WMMA 是 T4 能跑的最深一层——T4 没有 bf16、`cp.async`、INT8 `m16n8k32`。
+- 阶段 00~10 在 T4 上实测。阶段 10 的 FP16 WMMA 是 T4 能跑的最深一层——T4 没有 bf16、`cp.async`、INT8 `m16n8k32`。
 - 阶段 11（`cp.async`、bf16）需 sm_80+，阶段 12（Hopper）需 sm_90+。在 T4 上用 `nvcc -arch=sm_90` 做交叉编译与静态分析，**不写时间数字**；切到 B200 后转为实测。
 - 阶段 13（Blackwell `tcgen05`、TMEM、NVFP4）需 sm_100+，主要目标机器是 B200。
 - 阶段 14 综合项目在 T4 上完成，末尾有一个 B200 上的 Tensor Core 对照。

@@ -1,4 +1,4 @@
-# 阶段 1：执行模型与线程组织
+# 阶段 01：执行模型与线程组织
 
 ## 阶段目标
 
@@ -8,12 +8,12 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-warp-and-lane` | warp = 32、lane 与 `threadIdx` 的关系、每 SM 的 warp 调度 |
-| [ ] | `task-002-simt-divergence` | SIMT 与 divergence；分支代价如何被观察到 |
-| [ ] | `task-003-two-dimensional-indexing` | 2D/3D `blockDim`/`blockIdx`，与 1D 展开的等价性 |
-| [ ] | `task-004-block-size-and-grid-shape` | block 大小作为性能参数；尾块与最后一个 block 的部分空闲 |
+| [ ] | `task-006-warp-and-lane` | warp = 32、lane 与 `threadIdx` 的关系、每 SM 的 warp 调度 |
+| [ ] | `task-007-simt-divergence` | SIMT 与 divergence；分支代价如何被观察到 |
+| [ ] | `task-008-two-dimensional-indexing` | 2D/3D `blockDim`/`blockIdx`，与 1D 展开的等价性 |
+| [ ] | `task-009-block-size-and-grid-shape` | block 大小作为性能参数；尾块与最后一个 block 的部分空闲 |
 
-目录在本阶段开始时创建。
+本阶段 task 编号 006–010。目录在本阶段开始时创建。
 
 ## 阶段验收
 

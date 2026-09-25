@@ -1,6 +1,17 @@
 # 从 0 到 Blackwell：能力路线
 
-路线按“能运行 → 能测量 → 能解释 → 能修改”推进。方括号是学习进度：`[ ]` 未开始，`[-]` 进行中，`[x]` 已完成。每次只推进一个 task，下一项任务由助教放在 `experiments/stage-x/task-y-*-`（`x` 是阶段编号，`y` 是三位阶段内序号）。
+路线按“能运行 → 能测量 → 能解释 → 能修改”推进。方括号是学习进度：`[ ]` 未开始，`[-]` 进行中，`[x]` 已完成。每次只推进一个 task。
+
+## 命名与编号约定
+
+task 目录格式为 `experiments/stage-xx/task-nnn-topic/`：
+
+- `xx` 是两位阶段编号，从 `00` 到 `14`，**补零**。
+- `nnn` 是**三位全局连续序号，跨 stage 不重置**。阶段 00 的最后一个 task 是 `task-005`，那么阶段 01 的第一个 task 就是 `task-006`，以此类推。
+
+这样编号本身就是学习顺序：任何时刻看一个 task 的编号，就知道它在整条路线里的位置。下一个 task 永远是上一次编号 +1。
+
+**二进制产物随 task 一起提交。** 每个 task 目录里的可执行文件、nsys trace 等都保留，用于复刻当时的结果。换机器后可以先跑已提交的二进制确认行为一致，再重新编译。
 
 ## 怎么用这份路线
 
@@ -12,12 +23,13 @@
 
 ### 巩固任务
 
-每个阶段末尾有一个编号 `task-9xx` 的**巩固任务**。它有几个固定特征：
+每个阶段末尾有一个**巩固任务**。它有几个固定特征：
 
+- 编号不特殊，靠 `ROADMAP.md` 里“只引入”一列开头的 **`**巩固**`** 标记识别。
 - **不引入任何新概念。** 只允许复用本阶段已经教过的内容。
 - **换一个题型。** 巩固任务的算子、形状或索引模式必须与阶段内的教学任务不同，避免靠记忆而不是靠推理过关。
 - **需要独立完成。** 做完并记录之前不要看 [`resources/practice/`](resources/practice/) 里的参考实现；对答案时把差异写进 `result.md` 的“与参考实现的差异”一节。
-- **允许跳过。** 巩固任务标 `[ ]`，做不做由学习者决定；但阶段 14 的综合项目要求阶段 2、3、4、5 的巩固任务至少完成一个。
+- **允许跳过。** 巩固任务标 `[ ]`，做不做由学习者决定；但阶段 14 要求阶段 02、03、04、05 的巩固任务至少完成一个。
 
 阶段 14 是跨阶段的综合项目，检验的是组合能力而不是新知识。
 
@@ -40,7 +52,7 @@
 `ncu` 返回 `ERR_NVGPUCTRPERM`（容器内核参数 `RmProfilingAdminOnly: 1`，无法修改）。这是环境的稳定事实，不是偶发故障。处理方式：
 
 - 不把任何 ncu 计数器写进验收标准。
-- 阶段 7 安排一个任务建立“指标名 → 含义 → 期望量级 → 能支撑什么结论”的映射表，即使采不到数也要能写出期望量级。
+- `task-043` 安排建立“指标名 → 含义 → 期望量级 → 能支撑什么结论”的映射表，即使采不到数也要能写出期望量级。
 - 换到有权限的环境时按那张表补测，不用重做结论。
 
 ### 目标机：NVIDIA B200（sm_100）
@@ -86,9 +98,9 @@
 
 由此得到阶段与机器的对应关系：
 
-- **T4 实测**：阶段 0~10。阶段 10 的 FP16 WMMA 是 T4 上能跑的最深一层。
-- **T4 交叉编译 / 阅读**：阶段 11（`cp.async`、bf16、sm_80 tensorop）、阶段 12（Hopper）。用 `nvcc -arch=sm_90` 验证编译，**不写时间数字**。
-- **B200 实测**：阶段 12、13 全部转为实测任务，同时保留 T4 上的交叉编译结论作为对照。换机后这两阶段的 `result.md` 需要重写而不是补写。
+- **T4 实测**：task 001~067。阶段 10 的 FP16 WMMA 是 T4 上能跑的最深一层。
+- **T4 交叉编译 / 阅读**：task 068~079（阶段 11、12）。用 `nvcc -arch=sm_90` 验证编译，**不写时间数字**。
+- **B200 实测**：task 080~087（阶段 13）全部转为实测任务，同时保留 T4 上的交叉编译结论作为对照。换机后这两阶段的 `result.md` 需要重写而不是补写。
 - 阶段 11 在 B200 上也能实测，但 T4 上已完成的部分不必重做，只补 B200 的数字。
 
 ## 证据分级
@@ -106,27 +118,27 @@
 
 ## 阶段总览
 
-| 阶段 | 主题 | T4 | B200 | 累计能力 |
-| --- | --- | :---: | :---: | --- |
-| [0](#阶段-0工具链与可测量性) | 工具链与可测量性 | 实测 | — | 能编译、判错、计时、如实记录环境 |
-| [1](#阶段-1执行模型与线程组织) | 执行模型与线程组织 | 实测 | — | 能预测 warp 行为并解释 divergence |
-| [2](#阶段-2合并访问与内存事务) | 合并访问与内存事务 | 实测 | — | 能手算 sector 并据此改写索引 |
-| [3](#阶段-3shared-memory-与-bank-conflict) | shared memory 与 bank conflict | 实测 | — | 能用分块和 padding 消除冲突 |
-| [4](#阶段-4reduction-与-warp-原语) | Reduction 与 warp 原语 | 实测 | — | 能写出多层次 reduction |
-| [5](#阶段-5prefix-sum--scan) | Prefix sum / scan | 实测 | — | 能写出 work-efficient scan |
-| [6](#阶段-6histogram-与原子操作) | Histogram 与原子操作 | 实测 | — | 能用 privatization 降低 contention |
-| [7](#阶段-7性能分析方法论) | 性能分析方法论 | 实测 | — | 能用 roofline/occupancy/nsys/sanitizer 定位瓶颈 |
-| [8](#阶段-8sgemm-优化阶梯) | SGEMM 优化阶梯 | 实测 | — | 逐级优化并解释每级收益 |
-| [9](#阶段-9cuda-库与并发执行) | CUDA 库与并发执行 | 实测 | — | 会用库、stream、cooperative groups、graphs |
-| [10](#阶段-10tensor-core-与-wmma) | Tensor Core 与 WMMA | 实测 | 可选补测 | 能用 fragment 表达一次 MMA |
-| [11](#阶段-11cute-与-sm_80-低层-mma) | CuTe 与 sm_80+ 低层 MMA | 交叉编译 | 实测 | 能读懂并改写 CUTLASS 3.x mainloop |
-| [12](#阶段-12hopper) | Hopper | 交叉编译 | 实测 | 能解释并验证 WGMMA/TMA/cluster/warp specialization |
-| [13](#阶段-13blackwell) | Blackwell | 阅读 | 实测 | 能实现 tcgen05/TMEM/NVFP4 的最小可验证程序 |
-| [14](#阶段-14综合项目) | 综合项目 | 实测 | 实测 | 能独立把多个算子拼成完整流水线 |
+| 阶段 | task 区间 | 主题 | T4 | B200 | 累计能力 |
+| --- | --- | --- | :---: | :---: | --- |
+| [00](#阶段-00工具链与可测量性) | 001–005 | 工具链与可测量性 | 实测 | — | 能编译、判错、计时、如实记录环境 |
+| [01](#阶段-01执行模型与线程组织) | 006–010 | 执行模型与线程组织 | 实测 | — | 能预测 warp 行为并解释 divergence |
+| [02](#阶段-02合并访问与内存事务) | 011–016 | 合并访问与内存事务 | 实测 | — | 能手算 sector 并据此改写索引 |
+| [03](#阶段-03shared-memory-与-bank-conflict) | 017–022 | shared memory 与 bank conflict | 实测 | — | 能用分块和 padding 消除冲突 |
+| [04](#阶段-04reduction-与-warp-原语) | 023–029 | Reduction 与 warp 原语 | 实测 | — | 能写出多层次 reduction |
+| [05](#阶段-05prefix-sum--scan) | 030–034 | Prefix sum / scan | 实测 | — | 能写出 work-efficient scan |
+| [06](#阶段-06histogram-与原子操作) | 035–038 | Histogram 与原子操作 | 实测 | — | 能用 privatization 降低 contention |
+| [07](#阶段-07性能分析方法论) | 039–045 | 性能分析方法论 | 实测 | — | 能用 roofline/occupancy/nsys/sanitizer 定位瓶颈 |
+| [08](#阶段-08sgemm-优化阶梯) | 046–053 | SGEMM 优化阶梯 | 实测 | — | 逐级优化并解释每级收益 |
+| [09](#阶段-09cuda-库与并发执行) | 054–061 | CUDA 库与并发执行 | 实测 | — | 会用库、stream、cooperative groups、graphs |
+| [10](#阶段-10tensor-core-与-wmma) | 062–067 | Tensor Core 与 WMMA | 实测 | 可选补测 | 能用 fragment 表达一次 MMA |
+| [11](#阶段-11cute-与-sm_80-低层-mma) | 068–072 | CuTe 与 sm_80+ 低层 MMA | 交叉编译 | 实测 | 能读懂并改写 CUTLASS 3.x mainloop |
+| [12](#阶段-12hopper) | 073–079 | Hopper | 交叉编译 | 实测 | 能解释并验证 WGMMA/TMA/cluster/warp specialization |
+| [13](#阶段-13blackwell) | 080–087 | Blackwell | 阅读 | 实测 | 能实现 tcgen05/TMEM/NVFP4 的最小可验证程序 |
+| [14](#阶段-14综合项目) | 088–094 | 综合项目 | 实测 | 实测 | 能独立把多个算子拼成完整流水线 |
 
 ---
 
-## 阶段 0：工具链与可测量性
+## 阶段 00：工具链与可测量性
 
 **能力目标**：能把一个 CUDA 程序编译、运行、判错、稳定计时，并如实记录环境。本阶段专门补上“会测量”这件事——它不会随第一个 kernel 自动获得。
 
@@ -135,24 +147,24 @@
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
 | [x] | `task-001-vector-add` | 第一个 kernel、1D 索引、边界判断 |
-| [ ] | `task-002-device-query-and-error-check` | 设备查询与 `cudaGetLastError` / 错误检查宏 |
+| [-] | `task-002-device-query-and-error-check` | 设备查询与 `cudaGetLastError()` / 错误检查宏 |
 | [ ] | `task-003-compile-flags-and-resource-usage` | `nvcc` 选项与 `cuobjdump -res-usage` 看到的寄存器/共享内存 |
 | [ ] | `task-004-timing-protocol` | `cudaEvent` 计时、warm-up、重复、min/median/mean、空 kernel 的 launch 开销 |
-| [ ] | `task-901-巩固-harness` | **巩固**：把计时 harness 固化成可复用文件 |
+| [ ] | `task-005-巩固-harness` | **巩固**：把计时 harness 固化成可复用文件 |
 
 **阶段验收**
 
 - [ ] 能用 `cudaGetDeviceProperties` 打印并解释 CC、SM 数、L2 大小、峰值带宽四个字段的来源。
-- [ ] 能说出一个“编译通过但运行报错”的例子，并用 `cudaGetLastError` 与 `compute-sanitizer` 区分是启动失败还是运行中出错。
+- [ ] 能说出一个“编译通过但运行报错”的例子，并用 `cudaGetLastError()` 与 `compute-sanitizer` 区分是启动失败还是运行中出错。
 - [ ] 能用 `cuobjdump -res-usage` 读出某个 kernel 的寄存器数和静态共享内存数，并说明它受哪个编译选项影响。
 - [ ] 给出空 kernel 的 launch 开销中位数，后续所有 kernel 计时都以此为噪声下限。
-- [ ] 巩固任务产出的 harness 被阶段 1~7 复用。
+- [ ] 巩固任务产出的 harness 被阶段 01~07 复用。
 
 **硬件**：T4 实测。
 
 ---
 
-## 阶段 1：执行模型与线程组织
+## 阶段 01：执行模型与线程组织
 
 **能力目标**：能预测任意索引表达式下 warp 的访问集合，并用实验解释 divergence 和 block 形状的代价。
 
@@ -160,11 +172,11 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-warp-and-lane` | warp = 32、lane 与 `threadIdx` 的关系、每 SM 的 warp 调度 |
-| [ ] | `task-002-simt-divergence` | SIMT 与 divergence；分支代价如何被观察到 |
-| [ ] | `task-003-two-dimensional-indexing` | 2D/3D `blockDim`/`blockIdx`，与 1D 展开的等价性 |
-| [ ] | `task-004-block-size-and-grid-shape` | block 大小作为性能参数；尾块与最后一个 block 的部分空闲 |
-| [ ] | `task-901-巩固-2d-stencil` | **巩固**：2D stencil，找出会退化的索引写法并解释 |
+| [ ] | `task-006-warp-and-lane` | warp = 32、lane 与 `threadIdx` 的关系、每 SM 的 warp 调度 |
+| [ ] | `task-007-simt-divergence` | SIMT 与 divergence；分支代价如何被观察到 |
+| [ ] | `task-008-two-dimensional-indexing` | 2D/3D `blockDim`/`blockIdx`，与 1D 展开的等价性 |
+| [ ] | `task-009-block-size-and-grid-shape` | block 大小作为性能参数；尾块与最后一个 block 的部分空闲 |
+| [ ] | `task-010-巩固-2d-stencil` | **巩固**：2D stencil，找出会退化的索引写法并解释 |
 
 **阶段验收**
 
@@ -177,7 +189,7 @@
 
 ---
 
-## 阶段 2：合并访问与内存事务
+## 阶段 02：合并访问与内存事务
 
 **能力目标**：能手算一次访存跨多少个 sector，并据此改写索引使它合并。这是全路线中复用价值最高的一项能力。
 
@@ -185,12 +197,12 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-stride-and-sector` | stride 与 sector/transaction 的关系 |
-| [ ] | `task-002-coalesced-vs-strided` | 同一算法两种索引写法的因果对比 |
-| [ ] | `task-003-vectorized-load-float4` | `float4` / `int4` 向量化访存与对齐要求 |
-| [ ] | `task-004-transpose-access-patterns` | 转置中读与写不能同时合并 |
-| [ ] | `task-005-l1-l2-and-caching` | L1/L2 容量与 read-only cache；解释“看起来不合并却很快” |
-| [ ] | `task-901-巩固-sector-prediction` | **巩固**：先手算再实测，验证对陌生 kernel 的预测 |
+| [ ] | `task-011-stride-and-sector` | stride 与 sector/transaction 的关系 |
+| [ ] | `task-012-coalesced-vs-strided` | 同一算法两种索引写法的因果对比 |
+| [ ] | `task-013-vectorized-load-float4` | `float4` / `int4` 向量化访存与对齐要求 |
+| [ ] | `task-014-transpose-access-patterns` | 转置中读与写不能同时合并 |
+| [ ] | `task-015-l1-l2-and-caching` | L1/L2 容量与 read-only cache；解释“看起来不合并却很快” |
+| [ ] | `task-016-巩固-sector-prediction` | **巩固**：先手算再实测，验证对陌生 kernel 的预测 |
 
 **阶段验收**
 
@@ -203,7 +215,7 @@
 
 ---
 
-## 阶段 3：shared memory 与 bank conflict
+## 阶段 03：shared memory 与 bank conflict
 
 **能力目标**：能用分块让读写都合并，并用 padding 或 swizzle 消除 bank conflict。
 
@@ -211,12 +223,12 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-shared-memory-basics` | `__shared__` 的生命周期、per-block 独占、`__syncthreads()` |
-| [ ] | `task-002-dynamic-shared-memory` | `extern __shared__`、启动配置第三参数、`cudaFuncSetAttribute` 扩到 48KB 以上 |
-| [ ] | `task-003-bank-model` | bank 编号模型；构造并观测 N 路冲突 |
-| [ ] | `task-004-tiled-transpose` | 分块同时让读和写都合并 |
-| [ ] | `task-005-padding-and-swizzle` | `pitch` padding、XOR swizzle、转置存储 |
-| [ ] | `task-901-巩固-transpose-ladder` | **巩固**：把全部转置变体收进一个可比较的阶梯 |
+| [ ] | `task-017-shared-memory-basics` | `__shared__` 的生命周期、per-block 独占、`__syncthreads()` |
+| [ ] | `task-018-dynamic-shared-memory` | `extern __shared__`、启动配置第三参数、`cudaFuncSetAttribute` 扩到 48KB 以上 |
+| [ ] | `task-019-bank-model` | bank 编号模型；构造并观测 N 路冲突 |
+| [ ] | `task-020-tiled-transpose` | 分块同时让读和写都合并 |
+| [ ] | `task-021-padding-and-swizzle` | `pitch` padding、XOR swizzle、转置存储 |
+| [ ] | `task-022-巩固-transpose-ladder` | **巩固**：把全部转置变体收进一个可比较的阶梯 |
 
 **阶段验收**
 
@@ -229,7 +241,7 @@
 
 ---
 
-## 阶段 4：Reduction 与 warp 原语
+## 阶段 04：Reduction 与 warp 原语
 
 **能力目标**：能写出 block 内、跨 block 的 reduction，并解释每层归约用什么原语实现。
 
@@ -237,13 +249,13 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-naive-reduction` | 每线程部分和 + `atomicAdd`；先得到可用的 baseline |
-| [ ] | `task-002-shared-memory-reduction` | block 内树形归约与同步 |
-| [ ] | `task-003-warp-shuffle` | `__shfl_down_sync` / `__shfl_xor_sync` 的同步语义 |
-| [ ] | `task-004-atomic-vs-shuffle` | 两种实现的 contention 与耗时对比 |
-| [ ] | `task-005-multi-block-reduction` | 两阶段归约；grid sync 或单值原子累加 |
-| [ ] | `task-006-max-then-sum` | 为 softmax 做准备的两趟归约 |
-| [ ] | `task-901-巩固-segmented-reduction` | **巩固**：变长分段归约，只用本阶段原语 |
+| [ ] | `task-023-naive-reduction` | 每线程部分和 + `atomicAdd`；先得到可用的 baseline |
+| [ ] | `task-024-shared-memory-reduction` | block 内树形归约与同步 |
+| [ ] | `task-025-warp-shuffle` | `__shfl_down_sync` / `__shfl_xor_sync` 的同步语义 |
+| [ ] | `task-026-atomic-vs-shuffle` | 两种实现的 contention 与耗时对比 |
+| [ ] | `task-027-multi-block-reduction` | 两阶段归约；grid sync 或单值原子累加 |
+| [ ] | `task-028-max-then-sum` | 为 softmax 做准备的两趟归约 |
+| [ ] | `task-029-巩固-segmented-reduction` | **巩固**：变长分段归约，只用本阶段原语 |
 
 **阶段验收**
 
@@ -256,7 +268,7 @@
 
 ---
 
-## 阶段 5：Prefix sum / scan
+## 阶段 05：Prefix sum / scan
 
 **能力目标**：能写出 work-efficient 的并行 scan，并说明 bank conflict 在其中出现的位置。
 
@@ -264,11 +276,11 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-sequential-baseline` | 串行定义与 host 参考，明确 inclusive/exclusive |
-| [ ] | `task-002-hillis-steele` | 最naive并行 scan；O(n log n) 与额外读写 |
-| [ ] | `task-003-blelloch-work-efficient` | up-sweep/down-sweep；用 padding 处理非 2 的幂 |
-| [ ] | `task-004-block-scan-with-carry` | block 内 scan + block 间 carry；串行或 decoupled look-back |
-| [ ] | `task-901-巩固-stream-compaction` | **巩固**：用 scan 实现 stream compaction |
+| [ ] | `task-030-sequential-baseline` | 串行定义与 host 参考，明确 inclusive/exclusive |
+| [ ] | `task-031-hillis-steele` | 最naive并行 scan；O(n log n) 与额外读写 |
+| [ ] | `task-032-blelloch-work-efficient` | up-sweep/down-sweep；用 padding 处理非 2 的幂 |
+| [ ] | `task-033-block-scan-with-carry` | block 内 scan + block 间 carry；串行或 decoupled look-back |
+| [ ] | `task-034-巩固-stream-compaction` | **巩固**：用 scan 实现 stream compaction |
 
 **阶段验收**
 
@@ -281,7 +293,7 @@
 
 ---
 
-## 阶段 6：Histogram 与原子操作
+## 阶段 06：Histogram 与原子操作
 
 **能力目标**：能用 shared memory privatization 降低原子操作竞争。
 
@@ -289,10 +301,10 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-global-atomic-histogram` | 朴素全局 atomic 版本，作为 baseline |
-| [ ] | `task-002-shared-memory-private-histogram` | 私有化副本与块间合并 |
-| [ ] | `task-003-contention-and-replication` | 数据倾斜下的竞争；复制多份 histogram |
-| [ ] | `task-901-巩固-counting-sort` | **巩固**：用 histogram 实现 counting sort |
+| [ ] | `task-035-global-atomic-histogram` | 朴素全局 atomic 版本，作为 baseline |
+| [ ] | `task-036-shared-memory-private-histogram` | 私有化副本与块间合并 |
+| [ ] | `task-037-contention-and-replication` | 数据倾斜下的竞争；复制多份 histogram |
+| [ ] | `task-038-巩固-counting-sort` | **巩固**：用 histogram 实现 counting sort |
 
 **阶段验收**
 
@@ -305,7 +317,7 @@
 
 ---
 
-## 阶段 7：性能分析方法论
+## 阶段 07：性能分析方法论
 
 **能力目标**：能在没有 ncu 计数器权限的情况下，仍然系统地定位瓶颈并给出可验证的结论。这是本路线的“方法论阶段”，不引入新的 kernel。
 
@@ -313,13 +325,13 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-arithmetic-intensity-and-roofline` | 算术强度定义与 roofline 判据 |
-| [ ] | `task-002-occupancy-theory-and-api` | `cudaOccupancyMaxActiveBlocksPerMultiprocessor` 与理论占用率 |
-| [ ] | `task-003-latency-hiding-ilp-vs-tlp` | 指令级并行与线程级并行；展开与预取 |
-| [ ] | `task-004-nsys-workflow` | `nsys profile`、`nsys stats`、NVTX range 标记 |
-| [ ] | `task-005-ncu-metric-mapping` | 建立指标名 → 含义 → 期望量级 → 结论的映射表（采不到数也要写完） |
-| [ ] | `task-006-compute-sanitizer` | `--tool memcheck/racecheck/synccheck/initcheck` 定位真实 bug |
-| [ ] | `task-901-巩固-performance-report` | **巩固**：给一个陌生 kernel 写完整性能报告 |
+| [ ] | `task-039-arithmetic-intensity-and-roofline` | 算术强度定义与 roofline 判据 |
+| [ ] | `task-040-occupancy-theory-and-api` | `cudaOccupancyMaxActiveBlocksPerMultiprocessor` 与理论占用率 |
+| [ ] | `task-041-latency-hiding-ilp-vs-tlp` | 指令级并行与线程级并行；展开与预取 |
+| [ ] | `task-042-nsys-workflow` | `nsys profile`、`nsys stats`、NVTX range 标记 |
+| [ ] | `task-043-ncu-metric-mapping` | 建立指标名 → 含义 → 期望量级 → 结论的映射表（采不到数也要写完） |
+| [ ] | `task-044-compute-sanitizer` | `--tool memcheck/racecheck/synccheck/initcheck` 定位真实 bug |
+| [ ] | `task-045-巩固-performance-report` | **巩固**：给一个陌生 kernel 写完整性能报告 |
 
 **阶段验收**
 
@@ -329,11 +341,11 @@
 - [ ] 能用 `compute-sanitizer --tool racecheck` 找出一个真实的 shared memory 竞争。
 - [ ] 巩固任务的性能报告包含：环境、编译命令、warm-up 策略、min/median/mean、有效带宽、roofline 位置、瓶颈判断、证据分级。
 
-**硬件**：T4 实测；`task-005` 的计数器部分为“待验证”级证据。
+**硬件**：T4 实测；`task-043` 的计数器部分为“待验证”级证据。
 
 ---
 
-## 阶段 8：SGEMM 优化阶梯
+## 阶段 08：SGEMM 优化阶梯
 
 **能力目标**：逐级优化 SGEMM，每一级只加一个手段，并能用 roofline 解释收益从哪来。
 
@@ -341,14 +353,14 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-naive-sgemm` | 三重循环 baseline 与正确性 |
-| [ ] | `task-002-coalesced-sgemm` | 只改 B 的访问模式使其合并 |
-| [ ] | `task-003-shared-memory-tiling` | 用 shared memory tile 复用数据 |
-| [ ] | `task-004-thread-tiling-register-blocking` | 每线程算多个输出，减少读次数 |
-| [ ] | `task-005-warp-tiling-and-vectorized` | warp 级分块与向量化加载 |
-| [ ] | `task-006-occupancy-cliff` | 处理一个具体的占用率悬崖并解释 |
-| [ ] | `task-007-compare-cublas` | 与 cuBLAS SGEMM 对比，给出 TFLOP/s 与 roofline 差距 |
-| [ ] | `task-901-巩固-full-ladder` | **巩固**：不参考已有实现，自己重建完整阶梯并与 cuBLAS 对齐 |
+| [ ] | `task-046-naive-sgemm` | 三重循环 baseline 与正确性 |
+| [ ] | `task-047-coalesced-sgemm` | 只改 B 的访问模式使其合并 |
+| [ ] | `task-048-shared-memory-tiling` | 用 shared memory tile 复用数据 |
+| [ ] | `task-049-thread-tiling-register-blocking` | 每线程算多个输出，减少读次数 |
+| [ ] | `task-050-warp-tiling-and-vectorized` | warp 级分块与向量化加载 |
+| [ ] | `task-051-occupancy-cliff` | 处理一个具体的占用率悬崖并解释 |
+| [ ] | `task-052-compare-cublas` | 与 cuBLAS SGEMM 对比，给出 TFLOP/s 与 roofline 差距 |
+| [ ] | `task-053-巩固-full-ladder` | **巩固**：不参考已有实现，自己重建完整阶梯并与 cuBLAS 对齐 |
 
 **阶段验收**
 
@@ -361,7 +373,7 @@
 
 ---
 
-## 阶段 9：CUDA 库与并发执行
+## 阶段 09：CUDA 库与并发执行
 
 **能力目标**：知道什么时候该用库而不是自己写，并能用 stream 和 graph 把执行组织起来。
 
@@ -369,14 +381,14 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-cublas-baseline` | handle、stream、指针模式与 alpha/beta |
-| [ ] | `task-002-thrust` | host/device vector、`reduce`、`sort` |
-| [ ] | `task-003-cub-block-primitives` | block/warp/device 级原语与自定义算子 |
-| [ ] | `task-004-streams-and-async-copy` | `cudaStream`、pinned memory、`cudaMemcpyAsync` |
-| [ ] | `task-005-overlap-proof` | 用 event 证明拷贝与计算确实重叠 |
-| [ ] | `task-006-cooperative-groups` | grid sync、tiled partition、网格二分 |
-| [ ] | `task-007-cuda-graphs` | 捕获与重放，与 launch 开销对比 |
-| [ ] | `task-901-巩固-pipelined-pipeline` | **巩固**：把阶段 8 的 GEMM 与阶段 6 的 softmax 串成 stream 流水并用 graph 加速 |
+| [ ] | `task-054-cublas-baseline` | handle、stream、指针模式与 alpha/beta |
+| [ ] | `task-055-thrust` | host/device vector、`reduce`、`sort` |
+| [ ] | `task-056-cub-block-primitives` | block/warp/device 级原语与自定义算子 |
+| [ ] | `task-057-streams-and-async-copy` | `cudaStream`、pinned memory、`cudaMemcpyAsync` |
+| [ ] | `task-058-overlap-proof` | 用 event 证明拷贝与计算确实重叠 |
+| [ ] | `task-059-cooperative-groups` | grid sync、tiled partition、网格二分 |
+| [ ] | `task-060-cuda-graphs` | 捕获与重放，与 launch 开销对比 |
+| [ ] | `task-061-巩固-pipelined-pipeline` | **巩固**：把阶段 08 的 GEMM 与 softmax 串成 stream 流水并用 graph 加速 |
 
 **阶段验收**
 
@@ -399,12 +411,12 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-fp16-dtypes-and-error` | `__half` / `__half2`；T4 上 bf16 不可用的实测证据；累加精度与容差 |
-| [ ] | `task-002-wmma-fragments` | `fragment` 的 load / `mma_sync` / store 四个动作 |
-| [ ] | `task-003-fragment-layout-verification` | 自己写 host 侧参考，反推 fragment 的实际内存布局 |
-| [ ] | `task-004-wmma-gemm-vs-cublas-hgemm` | 与 cuBLAS HGEMM 对比，量化 T4 上 Tensor Core 的实际收益 |
-| [ ] | `task-005-mma-sync-ptx-m16n8k8` | 直接写 `mma.sync.m16n8k8.f16` inline PTX，与 WMMA 结果对拍 |
-| [ ] | `task-901-巩固-hgemm-independent` | **巩固**：不看参考实现独立写 WMMA HGEMM，再逐项对照 |
+| [ ] | `task-062-fp16-dtypes-and-error` | `__half` / `__half2`；T4 上 bf16 不可用的实测证据；累加精度与容差 |
+| [ ] | `task-063-wmma-fragments` | `fragment` 的 load / `mma_sync` / store 四个动作 |
+| [ ] | `task-064-fragment-layout-verification` | 自己写 host 侧参考，反推 fragment 的实际内存布局 |
+| [ ] | `task-065-wmma-gemm-vs-cublas-hgemm` | 与 cuBLAS HGEMM 对比，量化 T4 上 Tensor Core 的实际收益 |
+| [ ] | `task-066-mma-sync-ptx-m16n8k8` | 直接写 `mma.sync.m16n8k8.f16` inline PTX，与 WMMA 结果对拍 |
+| [ ] | `task-067-巩固-hgemm-independent` | **巩固**：不看参考实现独立写 WMMA HGEMM，再逐项对照 |
 
 **阶段验收**
 
@@ -427,11 +439,11 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-cute-layout-basics` | `Layout` / `TiledCopy` 的概念；用 `03_visualize_layout` 打印 layout |
-| [ ] | `task-002-ldmatrix-fragment-load` | `ldmatrix` / `ldmatrix.trans` 的作用与限制 |
-| [ ] | `task-003-cp-async-multistage-pipeline` | `cp.async` + 多级流水；commit/wait 的配对关系 |
-| [ ] | `task-004-sm80-tensorop-mainloop` | 读 `14_ampere_tensorop_gemm`，标出 mainloop 的三个阶段 |
-| [ ] | `task-901-巩固-cute-rewrite` | **巩固**：用 CuTe 重写一个阶段 3 已完成的 shared memory kernel |
+| [ ] | `task-068-cute-layout-basics` | `Layout` / `TiledCopy` 的概念；用 `03_visualize_layout` 打印 layout |
+| [ ] | `task-069-ldmatrix-fragment-load` | `ldmatrix` / `ldmatrix.trans` 的作用与限制 |
+| [ ] | `task-070-cp-async-multistage-pipeline` | `cp.async` + 多级流水；commit/wait 的配对关系 |
+| [ ] | `task-071-sm80-tensorop-mainloop` | 读 `14_ampere_tensorop_gemm`，标出 mainloop 的三个阶段 |
+| [ ] | `task-072-巩固-cute-rewrite` | **巩固**：用 CuTe 重写一个阶段 03 已完成的 shared memory kernel |
 
 **阶段验收**
 
@@ -454,13 +466,13 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-tma-and-mbarrier` | `cp.async.bulk.tensor`、TMA descriptor、`mbarrier` 的 arrive/wait |
-| [ ] | `task-002-cluster-and-distributed-shmem` | thread block cluster、分布式 shared memory、`cluster.map` |
-| [ ] | `task-003-wgmma-vs-wmma` | A/B 驻留位置、scale 语义、异步完成与等待方式 |
-| [ ] | `task-004-warp-specialization` | producer/consumer warp 分工与各自的 barrier |
-| [ ] | `task-005-pipeline-stages` | 把 stages 改成 2/3/4，统计 shared memory 与寄存器用量变化 |
-| [ ] | `task-006-hopper-fmha-dataflow` | 读 `88_hopper_fmha`，画出 attention 的数据路径 |
-| [ ] | `task-901-巩固-cluster-occupancy` | **巩固**：用 `cudaOccupancyMaxActiveClusters` 解释 cluster 形状如何影响 occupancy |
+| [ ] | `task-073-tma-and-mbarrier` | `cp.async.bulk.tensor`、TMA descriptor、`mbarrier` 的 arrive/wait |
+| [ ] | `task-074-cluster-and-distributed-shmem` | thread block cluster、分布式 shared memory、`cluster.map` |
+| [ ] | `task-075-wgmma-vs-wmma` | A/B 驻留位置、scale 语义、异步完成与等待方式 |
+| [ ] | `task-076-warp-specialization` | producer/consumer warp 分工与各自的 barrier |
+| [ ] | `task-077-pipeline-stages` | 把 stages 改成 2/3/4，统计 shared memory 与寄存器用量变化 |
+| [ ] | `task-078-hopper-fmha-dataflow` | 读 `88_hopper_fmha`，画出 attention 的数据路径 |
+| [ ] | `task-079-巩固-cluster-occupancy` | **巩固**：用 `cudaOccupancyMaxActiveClusters` 解释 cluster 形状如何影响 occupancy |
 
 **阶段验收**
 
@@ -482,14 +494,14 @@
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-tmem-alloc-and-fence` | TMEM 的分配/释放、`tcgen05.fence`、为什么需要独立于 shared memory 的存储 |
-| [ ] | `task-002-tcgen05-mma` | `tcgen05.mma` 的 operand 布局与 A 在 TMEM 中的表示 |
-| [ ] | `task-003-learn-cuda-sm100-ladder` | 逐版读 `matmul_v0`→`v7`，每版只回答“新增了什么、为什么需要” |
-| [ ] | `task-004-tcgen05-matmul-minimal` | 写一个最小 tcgen05 matmul，**在 B200 上跑通并验证正确性** |
-| [ ] | `task-005-nvfp4-and-mxfp` | block scaling 的 scale factor 存放位置；`72_*` 与 `75_*` 的差异 |
-| [ ] | `task-006-cluster-shapes-and-cta-pair` | 可变 cluster 形状、`73_*` 的 preferred cluster、B200 的非可移植 cluster size 16 |
-| [ ] | `task-007-capstone-dataflow` | 完整数据流：global → TMA → shared/TMEM → Tensor Core → epilogue |
-| [ ] | `task-901-巩固-tmem-vs-shared` | **巩固**：同一 GEMM 分别用 shared memory pipeline 与 TMEM 实现，对比资源占用与数据流 |
+| [ ] | `task-080-tmem-alloc-and-fence` | TMEM 的分配/释放、`tcgen05.fence`、为什么需要独立于 shared memory 的存储 |
+| [ ] | `task-081-tcgen05-mma` | `tcgen05.mma` 的 operand 布局与 A 在 TMEM 中的表示 |
+| [ ] | `task-082-learn-cuda-sm100-ladder` | 逐版读 `matmul_v0`→`v7`，每版只回答“新增了什么、为什么需要” |
+| [ ] | `task-083-tcgen05-matmul-minimal` | 写一个最小 tcgen05 matmul，**在 B200 上跑通并验证正确性** |
+| [ ] | `task-084-nvfp4-and-mxfp` | block scaling 的 scale factor 存放位置；`72_*` 与 `75_*` 的差异 |
+| [ ] | `task-085-cluster-shapes-and-cta-pair` | 可变 cluster 形状、`73_*` 的 preferred cluster、B200 的非可移植 cluster size 16 |
+| [ ] | `task-086-capstone-dataflow` | 完整数据流：global → TMA → shared/TMEM → Tensor Core → epilogue |
+| [ ] | `task-087-巩固-tmem-vs-shared` | **巩固**：同一 GEMM 分别用 shared memory pipeline 与 TMEM 实现，对比资源占用与数据流 |
 
 **阶段验收**
 
@@ -499,7 +511,7 @@
 - [ ] 能画出 `matmul_v0` 到 `matmul_v7` 每一步新增的能力，形成一条可讲述的演进链。
 - [ ] 能说明 NVFP4 与 MXFP 的 scale 粒度差异。
 - [ ] 巩固任务能说清 TMEM 版本相对 shared memory 版本省掉了什么数据搬运。
-- [ ] 在 T4 上完成的部分（`task-001`、`002`、`003`、`006` 的分析部分）不出现未实测的性能数字，并注明“B200 上需补测”。
+- [ ] 在 T4 上完成的部分（`task-080`、`081`、`082`、`085` 的分析部分）不出现未实测的性能数字，并注明“B200 上需补测”。
 
 **硬件**：T4 阅读 + 交叉编译；B200 实测（本阶段的主要目标机器）。
 
@@ -509,19 +521,19 @@
 
 **能力目标**：把前面各阶段的算子拼成完整流水线，检验组合能力。这一阶段不引入新指令，用的全是已经学过的东西。
 
-**前置**：阶段 2、3、4、5 的巩固任务至少完成一个；阶段 8、10、13 的验收标准已达成。
+**前置**：阶段 02、03、04、05 的巩固任务至少完成一个；阶段 08、10、13 的验收标准已达成。
 
 **资源**：[`cuda-kernel-academy/04-inference-engine/`](resources/performance/cuda-kernel-academy/04-inference-engine/)、[`learn-cuda/04_softmax/`](resources/modern-architectures/learn-cuda/04_softmax/)（naive softmax、online softmax、`atomicCAS`）、[`learn-cuda/07_attention/`](resources/modern-architectures/learn-cuda/07_attention/)、[`cuda-kernel-academy/03-hpc-advanced/src/05_attention/`](resources/performance/cuda-kernel-academy/03-hpc-advanced/src/05_attention/)。
 
 | 进度 | Task | 只引入 |
 | --- | --- | --- |
-| [ ] | `task-001-softmax-from-scratch` | 组合：阶段 4 归约 + 阶段 5 scan + 阶段 2 访存。含 max 减法保证数值稳定 |
-| [ ] | `task-002-layernorm-from-scratch` | 组合：两趟归约（mean/var）+ 向量化访存；与 `layernorm` 库对比 |
-| [ ] | `task-003-attention-naive` | 组合：矩阵乘 + softmax + 矩阵乘，先求对再优化 |
-| [ ] | `task-004-attention-tiled-and-fused` | 组合：阶段 3 分块 + 阶段 14 阶段的 online softmax，避免物化 N² 矩阵 |
-| [ ] | `task-005-fused-kernel-and-graph` | 组合：kernel fusion + CUDA Graph 降低 launch 开销 |
-| [ ] | `task-006-capstone-report` | **巩固**：完整技术报告，串起全路线的证据分级 |
-| [ ] | `task-901-巩固-port-to-blackwell` | **巩固**：把阶段 14 的核心算子在 B200 上用 Tensor Core 重做并对比 |
+| [ ] | `task-088-softmax-from-scratch` | 组合：阶段 04 归约 + 阶段 05 scan + 阶段 02 访存。含 max 减法保证数值稳定 |
+| [ ] | `task-089-layernorm-from-scratch` | 组合：两趟归约（mean/var）+ 向量化访存；与 `layernorm` 库对比 |
+| [ ] | `task-090-attention-naive` | 组合：矩阵乘 + softmax + 矩阵乘，先求对再优化 |
+| [ ] | `task-091-attention-tiled-and-fused` | 组合：阶段 03 分块 + online softmax，避免物化 N² 矩阵 |
+| [ ] | `task-092-fused-kernel-and-graph` | 组合：kernel fusion + CUDA Graph 降低 launch 开销 |
+| [ ] | `task-093-capstone-report` | **巩固**：完整技术报告，串起全路线的证据分级 |
+| [ ] | `task-094-巩固-port-to-blackwell` | **巩固**：把阶段 14 的核心算子在 B200 上用 Tensor Core 重做并对比 |
 
 **阶段验收**
 
@@ -529,23 +541,21 @@
 - [ ] softmax 任务能说明为什么需要减 max，以及不减去会怎样（构造溢出输入证明）。
 - [ ] attention 任务能给出朴素版与 fused 版的峰值显存占用对比。
 - [ ] 融合前后有可测量的时间差，且能说明差值主要来自 launch 开销还是访存量减少。
-- [ ] `task-006` 的报告包含：环境、全部编译命令、每个 kernel 的 min/median/mean、有效带宽或 TFLOP/s、roofline 位置、瓶颈判断、证据分级、以及仍未验证的清单。
-- [ ] `task-901` 在 B200 上给出 FP32 CUDA Core 与 FP16/BF16 Tensor Core 的同输入对照。
+- [ ] `task-093` 的报告包含：环境、全部编译命令、每个 kernel 的 min/median/mean、有效带宽或 TFLOP/s、roofline 位置、瓶颈判断、证据分级、以及仍未验证的清单。
+- [ ] `task-094` 在 B200 上给出 FP32 CUDA Core 与 FP16/BF16 Tensor Core 的同输入对照。
 
-**硬件**：阶段 14 全程 T4 实测；`task-901` 在 B200 上实测。
+**硬件**：阶段 14 全程 T4 实测；`task-094` 在 B200 上实测。
 
 ---
 
 ## 现状映射
 
-本路线重构后，仓库中已有内容对应关系如下。重构前已存在的 task 不移动目录，只在此登记；后续 task 按新编号创建。
+| 已有目录 | 现状 | task 编号 | 对应阶段 |
+| --- | --- | --- | --- |
+| `experiments/stage-00/task-001-vector-add` | 已完成 | 001 | 阶段 00 |
+| `experiments/stage-00/task-002-device-query-and-error-check` | 进行中 | 002 | 阶段 00 |
 
-| 已有目录 | 现状 | 对应新阶段 |
-| --- | --- | --- |
-| `experiments/stage-0/task-001-vector-add` | 已完成 | 阶段 0 `task-001` |
-| `experiments/stage-0/task-002-device-query-and-error-check` | 待开始 | 阶段 0 `task-002` |
-
-原 `task-002-transpose-coalescing/` 一次引入二维索引、shared memory、动态共享内存、bank 模型、计时协议共五项，已删除。其内容按新路线拆到阶段 2 的 `task-004`（转置的读与写不能同时合并）与阶段 3 的 `task-003`~`005`（bank 模型、分块、padding），计时协议移到阶段 0 的 `task-004`。
+原 `task-002-transpose-coalescing/` 一次引入二维索引、shared memory、动态共享内存、bank 模型、计时协议共五项，已删除。其内容按新路线拆到 `task-014`（转置的读与写不能同时合并）与 `task-019`~`021`（bank 模型、分块、padding），计时协议移到 `task-004`。
 
 阶段目录只在开始该阶段时创建，不预先建立空目录。
 

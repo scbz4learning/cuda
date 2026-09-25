@@ -11,10 +11,10 @@
 | `LeetCUDA/kernels/hgemm/cutlass/` | `cute` / `cute_dsl` / `cutlass-3.x` | 阶段 11 |
 | `LeetCUDA/kernels/hgemm/cublas/`、`bench/`、`naive/` | 基线与对比 | 阶段 10 |
 | `LeetCUDA/kernels/ws-hgemm/` | warp specialization | 阶段 12 |
-| `LeetCUDA/kernels/sgemm/`、`sgemv/` | CUDA Core 基线 | 阶段 8 |
-| `LeetCUDA/kernels/softmax/`、`layer-norm/`、`rms-norm/`、`rope/` | AI 算子 | 阶段 4~6 之后 |
+| `LeetCUDA/kernels/sgemm/`、`sgemv/` | CUDA Core 基线 | 阶段 08 |
+| `LeetCUDA/kernels/softmax/`、`layer-norm/`、`rms-norm/`、`rope/` | AI 算子 | 阶段 04~ 06 之后 |
 | `LeetCUDA/kernels/flash-attn/` | FlashAttention | 阶段 12 |
-| `LeetCUDA/kernels/reduce/`、`histogram/`、`mat-transpose/` | 并行模式 | 阶段 3~6 |
+| `LeetCUDA/kernels/reduce/`、`histogram/`、`mat-transpose/` | 并行模式 | 阶段 03~ 06 |
 
 ## 硬件限制
 

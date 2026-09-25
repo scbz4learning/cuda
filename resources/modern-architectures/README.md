@@ -53,7 +53,7 @@ nvcc -arch=sm_100a -c example.cu -o /dev/null  # Blackwell 架构特定（B200 �
 | `cutlass/media/docs/cpp/pipeline.md` | 多级流水（阶段 11） |
 | `cutlass/media/docs/cpp/blackwell_functionality.md` | Blackwell 特性总览（阶段 13） |
 | `cutlass/media/docs/cpp/blackwell_cluster_launch_control.md` | cluster launch control（阶段 13） |
-| `cutlass/media/docs/cpp/gemm_performance_measurement_methodology_guidelines.md` | **官方 GEMM 测量方法学**（阶段 7、8） |
+| `cutlass/media/docs/cpp/gemm_performance_measurement_methodology_guidelines.md` | **官方 GEMM 测量方法学**（阶段 07、8） |
 | `cutlass/media/docs/cpp/terminology.md` | 术语表，读源码前的对照表 |
 | `cutlass/media/docs/cpp/programming_guidelines.md` | CUTLASS 编码约定 |
 

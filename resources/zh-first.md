@@ -13,7 +13,7 @@
 ## CUDA 基础与实验
 
 - [NVIDIA cuda-samples](https://github.com/NVIDIA/cuda-samples)：官方可编译示例，优先做 transpose、reduction、scan、histogram。
-- [cuda-practice-tutorial](https://github.com/YouXam/cuda-practice-tutorial)：带练习和答案，适合阶段 1。
+- [cuda-practice-tutorial](https://github.com/YouXam/cuda-practice-tutorial)：带练习和答案，适合阶段 01。
 - [Openlab GPU Lecture](https://github.com/hageboeck/OpenlabLecture)：代码和练习优先，视频不是必需项。
 - [Stanford CS149 assignments](https://github.com/stanford-cs149)：并行编程作业，可作为额外练习。
 

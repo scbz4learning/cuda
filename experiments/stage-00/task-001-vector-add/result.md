@@ -1,8 +1,8 @@
 # Task 001 实验记录：运行第一个 CUDA kernel
 
 - 日期：2026-09-25
-- 阶段：stage-0
-- 代码位置：`experiments/stage-0/task-001-vector-add/vector_add.cu`
+- 阶段：stage-00
+- 代码位置：`experiments/stage-00/task-001-vector-add/vector_add.cu`
 - 上游 commit / 参考链接：无；本 task 为仓库内实验
 
 ## 环境
