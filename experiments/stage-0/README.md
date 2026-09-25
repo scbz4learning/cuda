@@ -7,6 +7,7 @@
 ## Task 队列
 
 - `task-001-vector-add/`：编译并解释第一个 CUDA kernel。（已完成）
+- `task-002-transpose-coalescing/`：矩阵转置、合并访问模式、shared memory bank conflict 与 padding。（进行中）
 - 后续 task：由助教根据 `ROADMAP.md`、基础资源和上一个 task 的结果生成，不提前伪造完成进度。
 
 ## 阶段验收
